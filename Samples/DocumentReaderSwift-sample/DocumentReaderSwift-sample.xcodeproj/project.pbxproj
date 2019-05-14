@@ -26,6 +26,7 @@
 		0A74D5301F8AB14F0055BE75 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 0A5A17521F1038160011FB0A /* Assets.xcassets */; };
 		0A74D5311F8AB14F0055BE75 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 0A5A174F1F1038160011FB0A /* Main.storyboard */; };
 		0A74D5321F8AB14F0055BE75 /* regula.license in Resources */ = {isa = PBXBuildFile; fileRef = 0A5A176B1F104CAC0011FB0A /* regula.license */; };
+		0A7985C8227C5E3B00BF670B /* FaceVerificationViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A7985C7227C5E3B00BF670B /* FaceVerificationViewController.swift */; };
 		0A88C194215559A000CF494D /* DefaultModeViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A88C193215559A000CF494D /* DefaultModeViewController.swift */; };
 		0A88C1962155860F00CF494D /* ChildModeViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A88C1952155860F00CF494D /* ChildModeViewController.swift */; };
 		986F42D52622CBF21BB79E2D /* Pods_DocumentReaderFullSwift_sample.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 344F549D103C377B1F9E0E8A /* Pods_DocumentReaderFullSwift_sample.framework */; };
@@ -38,6 +39,7 @@
 		0A5A17551F1038170011FB0A /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		0A5A176B1F104CAC0011FB0A /* regula.license */ = {isa = PBXFileReference; lastKnownFileType = file; path = regula.license; sourceTree = "<group>"; };
 		0A74D5381F8AB14F0055BE75 /* DocumentReaderFullSwift-sample.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "DocumentReaderFullSwift-sample.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		0A7985C7227C5E3B00BF670B /* FaceVerificationViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FaceVerificationViewController.swift; sourceTree = "<group>"; };
 		0A88C193215559A000CF494D /* DefaultModeViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DefaultModeViewController.swift; sourceTree = "<group>"; };
 		0A88C1952155860F00CF494D /* ChildModeViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChildModeViewController.swift; sourceTree = "<group>"; };
 		0A8BF70D1F2732F70041CC3E /* DocumentReaderFullSwift-sample-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "DocumentReaderFullSwift-sample-Info.plist"; sourceTree = "<group>"; };
@@ -100,6 +102,7 @@
 				0A5A174B1F1038160011FB0A /* AppDelegate.swift */,
 				0A88C193215559A000CF494D /* DefaultModeViewController.swift */,
 				0A88C1952155860F00CF494D /* ChildModeViewController.swift */,
+				0A7985C7227C5E3B00BF670B /* FaceVerificationViewController.swift */,
 				0A5A174F1F1038160011FB0A /* Main.storyboard */,
 				0A5A17521F1038160011FB0A /* Assets.xcassets */,
 				0A5A17541F1038170011FB0A /* LaunchScreen.storyboard */,
@@ -177,6 +180,7 @@
 				ORGANIZATIONNAME = "Dmitry Smolyakov";
 				TargetAttributes = {
 					0A74D5251F8AB14F0055BE75 = {
+						DevelopmentTeam = H6WR54S268;
 						LastSwiftMigration = 1000;
 					};
 				};
@@ -186,6 +190,7 @@
 			developmentRegion = English;
 			hasScannedForEncodings = 0;
 			knownRegions = (
+				English,
 				en,
 				Base,
 			);
@@ -239,9 +244,9 @@
 			files = (
 			);
 			inputPaths = (
-				"${SRCROOT}/Pods/Target Support Files/Pods-DocumentReaderFullSwift-sample/Pods-DocumentReaderFullSwift-sample-frameworks.sh",
-				"${PODS_ROOT}/DocumentReader/DocumentReader.framework",
-				"${PODS_ROOT}/DocumentReaderFull/DocumentReaderCore.framework",
+				"${PODS_ROOT}/Target Support Files/Pods-DocumentReaderFullSwift-sample/Pods-DocumentReaderFullSwift-sample-frameworks.sh",
+				"${PODS_ROOT}/DocumentReaderBeta/DocumentReader.framework",
+				"${PODS_ROOT}/DocumentReaderFullBeta/DocumentReaderCore.framework",
 			);
 			name = "[CP] Embed Pods Frameworks";
 			outputPaths = (
@@ -250,7 +255,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-DocumentReaderFullSwift-sample/Pods-DocumentReaderFullSwift-sample-frameworks.sh\"\n";
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-DocumentReaderFullSwift-sample/Pods-DocumentReaderFullSwift-sample-frameworks.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
 		0AB43C591F1106A000D75A11 /* Pod install */ = {
@@ -274,6 +279,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				0A7985C8227C5E3B00BF670B /* FaceVerificationViewController.swift in Sources */,
 				0A88C194215559A000CF494D /* DefaultModeViewController.swift in Sources */,
 				0A88C1962155860F00CF494D /* ChildModeViewController.swift in Sources */,
 				0A74D5291F8AB14F0055BE75 /* AppDelegate.swift in Sources */,
@@ -418,7 +424,7 @@
 			baseConfigurationReference = 93A121814324EC9A2A4EACC7 /* Pods-DocumentReaderFullSwift-sample.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				DEVELOPMENT_TEAM = "";
+				DEVELOPMENT_TEAM = H6WR54S268;
 				INFOPLIST_FILE = "$(SRCROOT)/DocumentReaderSwift-sample/DocumentReaderFullSwift-sample-Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
@@ -434,7 +440,7 @@
 			baseConfigurationReference = CF0BED9A71BCF6B5D11941BD /* Pods-DocumentReaderFullSwift-sample.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				DEVELOPMENT_TEAM = "";
+				DEVELOPMENT_TEAM = H6WR54S268;
 				INFOPLIST_FILE = "$(SRCROOT)/DocumentReaderSwift-sample/DocumentReaderFullSwift-sample-Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
