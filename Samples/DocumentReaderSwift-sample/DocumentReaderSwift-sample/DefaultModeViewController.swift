@@ -24,9 +24,7 @@ class DefaultModeViewController: UIViewController {
     @IBOutlet weak var activityIndicator: UIActivityIndicatorView!
     
     var imagePicker = UIImagePickerController()
-    
-    var docReader: DocReader?
-    
+        
     override func viewDidLoad() {
         super.viewDidLoad()
         initializationReader()
@@ -37,17 +35,14 @@ class DefaultModeViewController: UIViewController {
         guard let dataPath = Bundle.main.path(forResource: "regula.license", ofType: nil) else { return }
         guard let licenseData = try? Data(contentsOf: URL(fileURLWithPath: dataPath)) else { return }
         
-        //create DocReader object
-        let docReader = DocReader()
-        self.docReader = docReader
-        
         DispatchQueue.global().async {
             
-            docReader.prepareDatabase(databaseID: "Full", progressHandler: { (progress) in
+            RGLDocReader.shared().prepareDatabase(withID: "Full", progressHandler: { (progress) in
+                guard let progress = progress else { return }
                 let progressValue = String(format: "%.1f", progress.fractionCompleted * 100)
                 self.initializationLabel.text = "Downloading database: \(progressValue)%"
             }, completion: { (successfull, error) in
-                docReader.initilizeReader(license: licenseData) { (successfull, error) in
+                RGLDocReader.shared().initializeReader(withLicense: licenseData) { (successfull, error) in
                     DispatchQueue.main.async {
                         if successfull {
                             self.activityIndicator.stopAnimating()
@@ -59,12 +54,12 @@ class DefaultModeViewController: UIViewController {
                             self.pickerView.selectRow(0, inComponent: 0, animated: false)
                           
                             //set scenario
-                            if let firstScenario = docReader.availableScenarios.first {
-                              docReader.processParams.scenario = firstScenario.identifier
+                            if let firstScenario = RGLDocReader.shared().availableScenarios.first {
+                              RGLDocReader.shared().processParams.scenario = firstScenario.identifier
                             }
                           
                             //Get available scenarios
-                            for scenario in docReader.availableScenarios {
+                            for scenario in RGLDocReader.shared().availableScenarios {
                                 print(scenario)
                                 print("--------")
                             }
@@ -83,7 +78,7 @@ class DefaultModeViewController: UIViewController {
     // Use this code for recognize on photo from camera
     @IBAction func useCameraViewController(_ sender: UIButton) {
         //start recognize
-        docReader?.showScanner(self) { (action, result, error) in
+        RGLDocReader.shared().showScanner(fromPresenter: self) { (action, result, error) in
             switch action {
             case .cancel:
                 print("Cancelled by user")
@@ -103,19 +98,19 @@ class DefaultModeViewController: UIViewController {
         }
     }
     
-    func handleResult(result: DocumentReaderResults?) {
+    func handleResult(result: RGLDocumentReaderResults?) {
         guard let result = result else { return }
         print("Result class: \(result)")
         // use fast getValue method
-        let name = result.getTextFieldValueByType(fieldType: .ft_Surname_And_Given_Names)
+        let name = result.getTextFieldValue(by: .typeSurname_And_Given_Names)
         print("NAME: \(name ?? "empty field")")
         self.nameLabel.text = name
-        self.documentImage.image = result.getGraphicFieldImageByType(fieldType: .gf_DocumentFront, source: .rawImage)
-        self.portraitImageView.image = result.getGraphicFieldImageByType(fieldType: .gf_Portrait)
+        self.documentImage.image = result.getGraphicFieldImage(by: .documentFront, source: .rawImage)
+        self.portraitImageView.image = result.getGraphicFieldImage(by: .portrait)
         
         //go though all text results
         for textField in result.textResult.fields {
-            guard let value = result.getTextFieldValueByType(fieldType: textField.fieldType, lcid: textField.lcid) else { continue }
+            guard let value = result.getTextFieldValue(by: textField.fieldType, lcid: textField.lcid) else { continue }
             print("Field type name: \(textField.fieldName), value: \(value)")
         }
     }
@@ -171,7 +166,7 @@ extension DefaultModeViewController: UIImagePickerControllerDelegate, UINavigati
             self.dismiss(animated: true, completion: {
 
                 //start recognize
-                self.docReader?.recognizeImage(image, completion: { (action, result, error) in
+                RGLDocReader.shared().recognizeImage(image, cameraMode: false, completion: { (action, result, error) in
                     if action == .complete {
                         if result != nil {
                             print("Completed")
@@ -201,19 +196,17 @@ extension DefaultModeViewController: UIPickerViewDataSource {
     }
     
     public func pickerView(_ pickerView: UIPickerView, numberOfRowsInComponent component: Int) -> Int {
-        guard let docReader = docReader else { return 0 }
-        return docReader.availableScenarios.count
+        return RGLDocReader.shared().availableScenarios.count
     }
 }
 
 extension DefaultModeViewController: UIPickerViewDelegate {
     func pickerView(_ pickerView: UIPickerView, titleForRow row: Int, forComponent component: Int) -> String? {
-        return docReader?.availableScenarios[row].identifier
+        return RGLDocReader.shared().availableScenarios[row].identifier
     }
     
     public func pickerView(_ pickerView: UIPickerView, didSelectRow row: Int, inComponent component: Int) {
-        guard let docReader = docReader else { return }
-        self.docReader?.processParams.scenario = docReader.availableScenarios[row].identifier
+        RGLDocReader.shared().processParams.scenario = RGLDocReader.shared().availableScenarios[row].identifier
     }
 }
 
