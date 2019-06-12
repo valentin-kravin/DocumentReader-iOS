@@ -22,7 +22,7 @@
     @property (weak, nonatomic) IBOutlet UILabel *initializationLabel;
     @property (weak, nonatomic) IBOutlet UIActivityIndicatorView *activityIndicator;
 
-    @property (strong, nonatomic) DocReader *docReader;
+//    @property (strong, nonatomic) RGLDocReader *docReader;
 
     @property (strong, nonatomic) UIImagePickerController *imagePicker;
 
@@ -42,16 +42,16 @@
         NSString *dataPath = [[NSBundle mainBundle] pathForResource:@"regula.license" ofType:nil];
         NSData *licenseData = [NSData dataWithContentsOfFile:dataPath];
 
-        ProcessParams *params = [[ProcessParams alloc] init];
-        DocReader *docReader = [[DocReader alloc] initWithProcessParams:params];
+//        RGLProcessParams *params = [[RGLProcessParams alloc] init];
+//        RGLDocReader *docReader = [[RGLDocReader alloc] init];
         
-        [docReader prepareDatabaseWithDatabaseID:@"Full" progressHandler:^(NSProgress * _Nonnull progress) {
+        [[RGLDocReader shared] prepareDatabaseWithID:@"Full" progressHandler:^(NSProgress * _Nullable progress) {
             self.initializationLabel.text = [NSString stringWithFormat:@"%.1f", progress.fractionCompleted * 100];
-        } completion:^(BOOL successful, NSString * _Nullable error) {
-            if (successful) {
+        } completion:^(BOOL sucessfull, NSString * _Nullable error) {
+            if (sucessfull) {
                 self.initializationLabel.text = @"Initialization...";
-                [docReader initilizeReaderWithLicense:licenseData completion:^(BOOL successful, NSString * _Nullable error ) {
-                    if (successful) {
+                [[RGLDocReader shared] initializeReaderWithLicense:licenseData completion:^(BOOL successfull, NSString * _Nullable error) {
+                    if (sucessfull) {
                         [self.activityIndicator stopAnimating];
                         [self.initializationLabel setHidden:YES];
                         [self.userRecognizeImage setHidden:NO];
@@ -59,11 +59,17 @@
                         [self.pickerView setHidden:NO];
                         [self.pickerView reloadAllComponents];
                         [self.pickerView selectRow:0 inComponent:0 animated:NO];
-
-                        for (Scenario *scenario in docReader.availableScenarios) {
-                            NSLog(@"%@", scenario);
-                            NSLog(@"---------");
+                        
+                        // set scenario
+                        RGLScenario *scenario = [RGLDocReader shared].availableScenarios.firstObject;
+                        if (scenario) {
+                            [RGLDocReader shared].processParams.scenario = scenario.identifier;
                         }
+                        
+                        for (RGLScenario *scenario in [RGLDocReader shared].availableScenarios) {
+                            NSLog(@"%@", scenario);
+                            NSLog(@"\n---------");
+                        }                        
                     } else {
                         [self.activityIndicator stopAnimating];
                         self.initializationLabel.text = [NSString stringWithFormat:@"Initialization error: %@", error];
@@ -75,37 +81,30 @@
                 NSLog(@"%@", error);
             }
         }];
-
-        docReader.processParams.scenario = @"Ocr";
-        self.docReader = docReader;
     }
 
     - (IBAction)useCameraViewController:(UIButton *)sender {
-        [self.docReader showScanner:self completion:^(enum DocReaderAction action, DocumentReaderResults * _Nullable result, NSString * _Nullable error) {
+        [[RGLDocReader shared] showScannerFromPresenter:self completion:^(RGLDocReaderAction action, RGLDocumentReaderResults * _Nullable results, NSString * _Nullable error) {
             switch (action) {
-                case DocReaderActionCancel: {
+                case RGLDocReaderActionCancel: {
                     NSLog(@"Cancelled by user");
+                    break;
                 }
-                break;
-
-                case DocReaderActionComplete: {
+                case RGLDocReaderActionComplete: {
                     NSLog(@"Completed");
-                    [self handleScanResults:result];
+                    [self handleScanResults:results];
+                    break;
                 }
-                break;
-
-                case DocReaderActionError: {
+                case RGLDocReaderActionError: {
                     NSLog(@"Error string: %@", error);
+                    break;
                 }
-                break;
-
-                case DocReaderActionProcess: {
-                    NSLog(@"Scaning not finished. Result: %@", result);
+                case RGLDocReaderActionProcess: {
+                    NSLog(@"Scaning not finished. Result: %@", results);
+                    break;
                 }
-                break;
-
                 default:
-                break;
+                    break;
             }
         }];
     }
@@ -155,16 +154,16 @@
         }];
     }
 
-    - (void)handleScanResults:(DocumentReaderResults *)result {
+    - (void)handleScanResults:(RGLDocumentReaderResults *)results {
         // use fast getValue method
-        NSString *name = [result getTextFieldValueByTypeWithFieldType:FieldTypeFt_Surname_And_Given_Names];
-        NSLog(@"%@", name);
+        NSString *name = [results getTextFieldValueByType:RGLFieldTypeSurname_And_Given_Names];
+        NSLog(@"NAME: %@", name);
         self.nameLabel.text = name;
-        self.documentImage.image = [result getGraphicFieldImageByTypeWithFieldType:GraphicFieldTypeGf_DocumentFront source:ResultTypeRawImage];
-        self.portraitImageView.image = [result getGraphicFieldImageByTypeWithFieldType:GraphicFieldTypeGf_Portrait];
-
-        for (DocumentReaderTextField *textField in result.textResult.fields) {
-            NSString *value = [result getTextFieldValueByTypeWithFieldType:textField.fieldType lcid:textField.lcid];
+        self.documentImage.image = [results getGraphicFieldImageByType:RGLGraphicFieldTypeDocumentFront source:RGLResultTypeRawImage];
+        self.portraitImageView.image = [results getGraphicFieldImageByType:RGLGraphicFieldTypePortrait];
+        
+        for (RGLDocumentReaderTextField *textField in results.textResult.fields) {
+            NSString *value = [results getTextFieldValueByType:textField.fieldType lcid:textField.lcid];
             NSLog(@"Field type name: %@, value: %@", textField.fieldName, value);
         }
     }
@@ -173,13 +172,13 @@
         UIImage *image = info[UIImagePickerControllerOriginalImage];
         [self dismissViewControllerAnimated:YES completion:^{
 
-            [self.docReader recognizeImage:image cameraMode:NO completion:^(enum DocReaderAction action, DocumentReaderResults * _Nullable result, NSString * _Nullable error) {
-                if (action == DocReaderActionComplete) {
-                    if (result != nil) {
+            [[RGLDocReader shared] recognizeImage:image cameraMode:NO completion:^(RGLDocReaderAction action, RGLDocumentReaderResults * _Nullable results, NSString * _Nullable error) {
+                if (action == RGLDocReaderActionComplete) {
+                    if (results != nil) {
                         NSLog(@"Completed");
-                        [self handleScanResults:result];
+                        [self handleScanResults:results];
                     }
-                } else if (action == DocReaderActionError) {
+                } else if (action == RGLDocReaderActionError) {
                     [self dismissViewControllerAnimated:YES completion:nil];
                     NSLog(@"Something went wrong");
                 }
@@ -193,15 +192,15 @@
     }
 
     - (NSInteger)pickerView:(UIPickerView *)pickerView numberOfRowsInComponent:(NSInteger)component {
-        return self.docReader.availableScenarios.count;
+        return [RGLDocReader shared].availableScenarios.count;
     }
 
 
     - (nullable NSString *)pickerView:(UIPickerView *)pickerView titleForRow:(NSInteger)row forComponent:(NSInteger)component {
-        return self.docReader.availableScenarios[row].identifier;
+        return [RGLDocReader shared].availableScenarios[row].identifier;
     }
 
     - (void)pickerView:(UIPickerView *)pickerView didSelectRow:(NSInteger)row inComponent:(NSInteger)component {
-        self.docReader.processParams.scenario = self.docReader.availableScenarios[row].identifier;
+        [RGLDocReader shared].processParams.scenario = [RGLDocReader shared].availableScenarios[row].identifier;
     }
 @end
