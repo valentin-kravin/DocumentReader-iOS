@@ -22,8 +22,6 @@
     @property (weak, nonatomic) IBOutlet UILabel *initializationLabel;
     @property (weak, nonatomic) IBOutlet UIActivityIndicatorView *activityIndicator;
 
-//    @property (strong, nonatomic) RGLDocReader *docReader;
-
     @property (strong, nonatomic) UIImagePickerController *imagePicker;
 
 @end
@@ -41,9 +39,6 @@
         //initialize license
         NSString *dataPath = [[NSBundle mainBundle] pathForResource:@"regula.license" ofType:nil];
         NSData *licenseData = [NSData dataWithContentsOfFile:dataPath];
-
-//        RGLProcessParams *params = [[RGLProcessParams alloc] init];
-//        RGLDocReader *docReader = [[RGLDocReader alloc] init];
         
         [[RGLDocReader shared] prepareDatabaseWithID:@"Full" progressHandler:^(NSProgress * _Nullable progress) {
             self.initializationLabel.text = [NSString stringWithFormat:@"%.1f", progress.fractionCompleted * 100];
@@ -69,7 +64,7 @@
                         for (RGLScenario *scenario in [RGLDocReader shared].availableScenarios) {
                             NSLog(@"%@", scenario);
                             NSLog(@"\n---------");
-                        }                        
+                        }
                     } else {
                         [self.activityIndicator stopAnimating];
                         self.initializationLabel.text = [NSString stringWithFormat:@"Initialization error: %@", error];
