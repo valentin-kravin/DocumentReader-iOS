@@ -31,7 +31,7 @@ class ChildModeViewController: UIViewController {
         
         presentButton.isHidden = true
         
-        RGLDocReader.shared().prepareDatabase(withID: "Full", progressHandler: { (progress) in
+        RGLDocReader.shared().prepareDatabase(withDatabaseID: "Full", progressHandler: { (progress) in
             guard let progress = progress else { return }
             let progressValue = String(format: "%.1f", progress.fractionCompleted * 100)
             self.initializationLabel.text = "Downloading database: \(progressValue)%"

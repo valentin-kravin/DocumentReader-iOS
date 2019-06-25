@@ -37,7 +37,7 @@ class DefaultModeViewController: UIViewController {
         
         DispatchQueue.global().async {
             
-            RGLDocReader.shared().prepareDatabase(withID: "Full", progressHandler: { (progress) in
+            RGLDocReader.shared().prepareDatabase(withDatabaseID: "Full", progressHandler: { (progress) in
                 guard let progress = progress else { return }
                 let progressValue = String(format: "%.1f", progress.fractionCompleted * 100)
                 self.initializationLabel.text = "Downloading database: \(progressValue)%"
@@ -102,7 +102,7 @@ class DefaultModeViewController: UIViewController {
         guard let result = result else { return }
         print("Result class: \(result)")
         // use fast getValue method
-        let name = result.getTextFieldValue(by: .typeSurname_And_Given_Names)
+        let name = result.getTextFieldValue(by: .surname_And_Given_Names)
         print("NAME: \(name ?? "empty field")")
         self.nameLabel.text = name
         self.documentImage.image = result.getGraphicFieldImage(by: .documentFront, source: .rawImage)
